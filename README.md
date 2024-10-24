@@ -16,3 +16,7 @@
 - Submission Details: [project_plan.md](./project_plan/project_plan.md)
 - Team Submission: [Project Plan](./project_plan/project_plan.pdf)
 - Database Schema: [png](./project_plan/project_database_schema_pgadmin.png)
+
+## Database Setup
++ Database Tables and Constraints: [movies_db.sql](./setup/movies_db.sql)
++ Movie Records *#TODO*
