@@ -20,3 +20,6 @@
 ## Database Setup
 + Database Tables and Constraints: [movies_db.sql](./setup/movies_db.sql)
 + Movie Records *#TODO*
+
+## Preprocessing Data
++ Data preprocessing is done using [jupyter notebook](./python_files/Movies_2_DE.ipynb).
