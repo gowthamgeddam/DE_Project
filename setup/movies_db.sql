@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS public.directed
     PRIMARY KEY (id, director_name)
 );
 
-CREATE TABLE IF NOT EXISTS public."cast"
+CREATE TABLE IF NOT EXISTS public.movie_cast
 (
     id bigint NOT NULL,
     actor_name character varying NOT NULL,
@@ -125,7 +125,7 @@ ALTER TABLE IF EXISTS public.directed
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS public."cast"
+ALTER TABLE IF EXISTS public.movie_cast
     ADD FOREIGN KEY (id)
     REFERENCES public.movie (id) MATCH SIMPLE
     ON UPDATE NO ACTION
