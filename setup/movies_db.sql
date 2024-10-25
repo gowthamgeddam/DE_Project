@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.movie
 CREATE TABLE IF NOT EXISTS public.imdb_details
 (
     id bigint NOT NULL,
-    imdb_id bigint NOT NULL,
+    imdb_id character varying NOT NULL,
     popularity double precision,
     vote_count bigint,
     vote_average double precision,
