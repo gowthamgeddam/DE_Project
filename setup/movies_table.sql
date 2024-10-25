@@ -2088,7 +2088,6 @@ INSERT INTO movie (id, original_title) VALUES (44603,"Hereafter");
 INSERT INTO movie (id, original_title) VALUES (51250,"Gun");
 INSERT INTO movie (id, original_title) VALUES (43931,"My Soul to Take");
 INSERT INTO movie (id, original_title) VALUES (42194,"TEKKEN");
-INSERT INTO movie (id, original_title) VALUES (42194,"TEKKEN");
 INSERT INTO movie (id, original_title) VALUES (60309,"The Conspirator");
 INSERT INTO movie (id, original_title) VALUES (35153,"The Heavy");
 INSERT INTO movie (id, original_title) VALUES (34803,"Death at a Funeral");
