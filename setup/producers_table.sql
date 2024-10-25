@@ -8468,7 +8468,6 @@ INSERT INTO production (id, production_company) VALUES (51999, 'Danish Filminsti
 INSERT INTO production (id, production_company) VALUES (51999, 'Film i VÃ¤st');
 INSERT INTO production (id, production_company) VALUES (50456, 'Focus Features');
 INSERT INTO production (id, production_company) VALUES (50456, 'Neunte Babelsberg Film');
-INSERT INTO production (id, production_company) VALUES (50456, 'Focus Features');
 INSERT INTO production (id, production_company) VALUES (50456, 'Holleran Company');
 INSERT INTO production (id, production_company) VALUES (50456, 'Sechzehnte Babelsberg Film');
 INSERT INTO production (id, production_company) VALUES (70670, 'Nordisk Film');
