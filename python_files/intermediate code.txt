@@ -1,0 +1,433 @@
+import pandas as pd
+import plotly.express as px
+from conn import run_query
+import streamlit as st
+from logout import clear_session
+
+def user_dashboard():
+    # Custom CSS for background and header
+    def add_custom_css():
+        st.markdown(
+            """
+            <style>
+            /* Background color for the page */
+            body {
+                background-color: #01172B;
+            }
+            .header1 {
+                padding: 1rem;
+                color: white;
+                background-color: #4B6587;
+                text-align: left;
+                width: 100%;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .logout-button {
+                padding: 8px 16px;
+                background-color: #333;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+    add_custom_css()
+
+   
+    if st.sidebar.button("Logout"):
+        clear_session()
+
+    st.markdown('<div class="header1"><h1>User Dashboard</h1></div>', unsafe_allow_html=True)
+
+    
+
+    # Initialize session state variables for dashboard page and director offset
+    if 'dashboard_page' not in st.session_state:
+        st.session_state['dashboard_page'] = 1
+    if 'director_offset' not in st.session_state: #Query 1
+        st.session_state['director_offset'] = 0
+    if 'dir_offset' not in st.session_state: #Query 5
+        st.session_state['dir_offset'] = 0
+    if 'corr_offset' not in st.session_state: #Query 6
+        st.session_state['corr_offset'] = 0
+
+    def show_main_dashboard1():
+        st.markdown(
+            """
+            <style>
+                /* Container styling for each query */
+                .query-container {
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    background-color: #f0f2f6; /* Light background for better contrast */
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+                }
+                .header-text {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    color: #AEDBF0;
+                    text-align: center;
+                    margin-bottom: 1rem;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+        coln1, coln2 = st.columns([1, 1])
+
+        ###############################################    Query1   ##############################################
+        with coln1:
+            DIRECTORS_PER_PAGE = 5
+
+            def fetch_directors(offset, limit):
+                query = f"""
+                    SELECT d.director_name, COUNT(m.id) AS movie_count
+                    FROM directed d
+                    JOIN movie m ON d.id = m.id
+                    GROUP BY d.director_name
+                    ORDER BY movie_count DESC
+                    LIMIT {limit} OFFSET {offset};
+                """
+                return run_query(query)
+
+            # Fetch the current page of directors
+            directors = fetch_directors(st.session_state['director_offset'], DIRECTORS_PER_PAGE)
+            df_directors = pd.DataFrame(directors, columns=["Director Name", "Movies Directed"])
+
+            # Display the top directors
+            st.markdown('<div class="header-text">Top Directors by Number of Movies</div>', unsafe_allow_html=True)
+            st.table(df_directors)
+
+            # Pagination controls
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("Previous Directors") and st.session_state['director_offset'] >= DIRECTORS_PER_PAGE:
+                    st.session_state['director_offset'] -= DIRECTORS_PER_PAGE
+
+            with col2:
+                if st.button("Next Directors"):
+                    st.session_state['director_offset'] += DIRECTORS_PER_PAGE
+
+        ###############################################   end of Query1   ##############################################
+
+        ###############################################    Query2   ##############################################
+        with coln2:
+            query1 = """
+                SELECT m.original_title, f.revenue / f.budget AS profit_margin 
+                FROM movie m  
+                JOIN finances f ON m.id = f.id 
+                WHERE f.budget > 0 
+                ORDER BY profit_margin DESC 
+                LIMIT 5;
+            """
+            movie_data = run_query(query1)
+            df = pd.DataFrame(movie_data, columns=["movie_title", "profit_margin"])
+
+            
+            st.markdown('<div class="header-text">Revenue-to-Budget Ratio:</div>', unsafe_allow_html=True)
+            tab1,tab2,tab3= st.tabs(["Bar Chart", "Scatter Plot", "Pie Chart"])
+
+            
+            fig1 = px.bar(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+            fig1.update_layout(plot_bgcolor="rgba(0,0,0,0)", xaxis=(dict(showgrid=False)))
+            tab1.plotly_chart(fig1)
+           
+            fig = px.scatter(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+            tab2.plotly_chart(fig)
+            
+            fig = px.pie(df, values="profit_margin", names="movie_title", title="Highest Profit Margin")
+            tab3.plotly_chart(fig)
+
+        ###############################################   end of Query2  ##############################################
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    def show_main_dashboard2():
+        st.markdown(
+            """
+            <style>
+                /* Container styling for each query */
+                .query-container {
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    background-color: #f0f2f6; /* Light background for better contrast */
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+                }
+                .header-text {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    color: #AEDBF0;
+                    text-align: center;
+                    margin-bottom: 1rem;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        coln1, coln2 = st.columns([1, 1])
+
+        ###############################################    Query3   ##############################################
+        with coln1:
+            # Wrapping the first query in a styled container
+            
+            st.markdown('<div class="header-text">Directors with the Most Movies in the Top 100 Grossing Films</div>', unsafe_allow_html=True)
+
+            query = """
+                SELECT d.director_name, COUNT(m.id) AS movie_count
+                FROM directed d
+                JOIN movie m ON d.id = m.id
+                JOIN (
+                    SELECT id
+                    FROM finances
+                    ORDER BY revenue DESC
+                    LIMIT 100
+                ) AS top_movies ON m.id = top_movies.id
+                GROUP BY d.director_name
+                ORDER BY movie_count DESC;
+            """
+            data = run_query(query)
+            df = pd.DataFrame(data, columns=["Director", "Movie Count"])
+
+            fig = px.bar(
+                df, x="Movie Count", y="Director", orientation='h',
+                title="Directors with the Most Movies in the Top 100 Grossing Films",
+                labels={"Movie Count": "Number of Movies"}
+            )
+            fig.update_layout(plot_bgcolor="rgba(0,0,0,0)", xaxis=dict(showgrid=False))
+            st.plotly_chart(fig)
+
+            
+
+
+        ###############################################   end of Query3   ##############################################
+
+        ###############################################    Query4  ##############################################
+        with coln2:
+        # Wrapping the second query in a styled container
+                st.markdown('<div class="header-text">Actors with the Highest Average Vote in Sci-Fi Movies</div>', unsafe_allow_html=True)
+
+                query = """
+                    SELECT c.actor_name, AVG(imd.vote_average) AS avg_vote
+                    FROM movie_cast c
+                    JOIN movie m ON c.id = m.id
+                    JOIN movie_genre mg ON m.id = mg.id
+                    JOIN imdb_details imd ON m.id = imd.id
+                    WHERE mg.genre = 'Science Fiction'
+                    GROUP BY c.actor_name
+                    ORDER BY avg_vote DESC
+                    LIMIT 5;
+                """
+                data = run_query(query)
+                df = pd.DataFrame(data, columns=["Actor", "Average Vote"])
+
+                fig = px.scatter(
+                    df, x="Actor", y="Average Vote",
+                    size="Average Vote", color="Average Vote", color_continuous_scale="Viridis",
+                    title="Actors with the Highest Average Vote in Sci-Fi Movies"
+                )
+                fig.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+                st.plotly_chart(fig)
+
+                
+
+        ###############################################   end of Query4  ##############################################
+
+
+
+        ####################################################  Query5 ##############################################
+
+       
+
+        ###############################################   end of Query5  ##############################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def show_main_dashboard3():
+        coln1, coln2 = st.columns([1, 1])
+
+       
+        ####################################################  Query6 ##############################################
+
+        with coln1:
+                corr_per_page = 5
+                if 'corr_offset' not in st.session_state:
+                    st.session_state['corr_offset'] = 0
+
+                # Query to get genre and correlation between popularity and revenue
+                def corr(offset, limit):
+                    query1 = f"""
+                        SELECT mg.genre, CORR(imd.popularity, f.revenue) AS popularity_revenue_corr
+                        FROM movie_genre mg
+                        JOIN movie m ON mg.id = m.id
+                        JOIN imdb_details imd ON m.id = imd.id
+                        JOIN finances f ON m.id = f.id
+                        GROUP BY mg.genre
+                        ORDER BY popularity_revenue_corr DESC
+                        LIMIT {limit} OFFSET {offset};
+                    """
+                    return run_query(query1)
+
+                # Fetch the current page of correlation data
+                corr_data = corr(st.session_state['corr_offset'], corr_per_page)
+                df_corr = pd.DataFrame(corr_data, columns=["Genre", "Popularity_Revenue_Correlation"])
+
+                # Display section header
+                st.subheader("Correlation Heatmap: Popularity vs. Revenue by Genre")
+
+                # Generate a heatmap using Plotly
+                fig = px.imshow(
+                    df_corr.set_index("Genre").T,  # Transpose for a vertical heatmap
+                    color_continuous_scale="RdBu",
+                    aspect="auto",
+                    title="Popularity and Revenue Correlation by Genre",
+                    labels={"color": "Correlation Coefficient"},
+                )
+                fig.update_layout(
+                    coloraxis_colorbar=dict(title="Correlation", tickvals=[-1, 0, 1], ticktext=["-1", "0", "1"]),
+                    plot_bgcolor="rgba(0,0,0,0)"
+                )
+                st.plotly_chart(fig)
+
+                # Pagination controls for genres
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    if st.button("Previous Genres") and st.session_state['corr_offset'] >= corr_per_page:
+                        st.session_state['corr_offset'] -= corr_per_page
+
+                with col2:
+                    if st.button("Next Genres"):
+                        st.session_state['corr_offset'] += corr_per_page
+
+                        
+        ###############################################   end of Query6  ##############################################
+
+        ###############################################    Query2   ##############################################
+        with coln2:
+            query1 = """
+                SELECT m.original_title, f.revenue / f.budget AS profit_margin 
+                FROM movie m  
+                JOIN finances f ON m.id = f.id 
+                WHERE f.budget > 0 
+                ORDER BY profit_margin DESC 
+                LIMIT 5;
+            """
+            movie_data = run_query(query1)
+            df = pd.DataFrame(movie_data, columns=["movie_title", "profit_margin"])
+
+            st.subheader("Revenue-to-Budget Ratio:")
+            plot_type = st.selectbox("Select Plot Type", ["Bar Chart", "Scatter Plot", "Pie Chart"])
+
+            if plot_type == "Bar Chart":
+                fig1 = px.bar(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+                fig1.update_layout(plot_bgcolor="rgba(0,0,0,0)", xaxis=(dict(showgrid=False)))
+                st.plotly_chart(fig1)
+            elif plot_type == "Scatter Plot":
+                fig = px.scatter(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+                st.plotly_chart(fig)
+            elif plot_type == "Pie Chart":
+                fig = px.pie(df, values="profit_margin", names="movie_title", title="Highest Profit Margin")
+                st.plotly_chart(fig)
+
+        ###############################################   end of Query2  ##############################################
+
+
+
+     
+
+
+
+
+    # Display the main dashboard or an empty panel based on the page state
+    if st.session_state['dashboard_page'] == 1:
+        show_main_dashboard1()
+    elif st.session_state['dashboard_page'] == 2:
+        show_main_dashboard2()
+    elif st.session_state['dashboard_page'] == 3:
+        show_main_dashboard3()
+    else:
+        st.error("You have reached the end!")
+
+
+    # Navigation between pages
+    nav_col1, nav_col2 = st.columns([1, 1])
+    with nav_col1:
+        if st.session_state['dashboard_page'] > 1:
+            if st.sidebar.button("Previous Page"):
+                st.session_state['dashboard_page'] -= 1
+
+    with nav_col2:
+        if st.sidebar.button("Next Page"):
+            st.session_state['dashboard_page'] += 1
+

@@ -1,0 +1,408 @@
+import streamlit as st
+from user import user_dashboard
+from admin import admin_dashboard
+
+# Set page configuration and add CSS for custom styling
+st.set_page_config(page_title="Movies Dashboard", page_icon=":bar_chart:", layout="wide")
+
+def add_custom_css():
+    st.markdown(
+        """
+        <style>
+        /* Style for header with a background color */
+        .header {
+            padding: 2rem;
+            color: white;
+            background-color: #4B6587;
+            text-align: left;
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        /* Style for login form container */
+        .login-container {
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #F8F9FA;
+            text-align: center;
+            color:blue;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the login button */
+        .login-button button {
+            background-color: #4B6587 !important;
+            color: white !important;
+            width: 100%;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            border-radius: 8px;
+        }
+        
+        /* Align selectbox dropdown */
+        .stSelectbox {
+            width: 100%;
+        }
+        
+        /* Centered text input fields */
+        .stTextInput, .stPasswordInput {
+            width: 100%;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call function to add custom CSS styling
+add_custom_css()
+
+def login():
+    # Create columns for layout and center login form
+    col1, col2, col3 = st.columns([1, 10, 1])
+
+    # Header with background color
+    with col2:
+        st.markdown('<div class="header"><h1>Movies Dashboard</h1></div>', unsafe_allow_html=True)
+        
+        # Login form container with styling
+        with st.container():
+            st.markdown('<div class="login-container"><h2>Login</h2></div>', unsafe_allow_html=True)
+            
+            
+            # Wider text inputs with placeholders
+            username = st.text_input("Username", placeholder="Enter your username", key="input_username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password", key="input_password")
+            role = st.selectbox("Role", ["User", "Admin"], key="input_role")
+
+            # Login button with styled container
+            if st.button("Login", key="login-button", help="Click to log in"):
+                if authenticate(username, password, role):
+                    # Set session state only upon successful login
+                    st.session_state["logged_in"] = True
+                    st.session_state["role"] = role
+                    st.session_state["username"] = username
+                else:
+                    st.error("Invalid username or password")
+            st.markdown('</div>', unsafe_allow_html=True)  # Close login-container
+
+def authenticate(username, password, role):
+    # Hardcoded users for example, replace with database check
+    users = {"user": "123", "admin": "456"}
+    return username in users and users[username] == password and role in ["User", "Admin"]
+
+def main():
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+
+    if st.session_state["logged_in"]:
+        if st.session_state["role"] == "Admin":
+            admin_dashboard()
+        else:
+            user_dashboard()
+    else:
+        login()
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+if 'director_offset' not in st.session_state:
+    st.session_state['director_offset'] = 0
+DIRECTORS_PER_PAGE = 5
+
+def fetch_directors(offset, limit):
+    query = f"""
+        SELECT d.director_name, COUNT(m.id) AS movie_count
+        FROM director d
+        JOIN movie_director md ON d.id = md.director_id
+        JOIN movie m ON md.movie_id = m.id
+        GROUP BY d.director_name
+        ORDER BY movie_count DESC
+        LIMIT {limit} OFFSET {offset};
+    """
+    return run_query(query)
+
+def user_dashboard():
+    st.title("User Dashboard")
+
+    # Fetch the current page of directors
+    directors = fetch_directors(st.session_state['director_offset'], DIRECTORS_PER_PAGE)
+    df_directors = pd.DataFrame(directors, columns=["Director Name", "Movies Directed"])
+
+    # Display the top directors
+    st.subheader("Top Directors by Number of Movies")
+    st.table(df_directors)
+
+    # Pagination controls
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("Previous") and st.session_state['director_offset'] >= DIRECTORS_PER_PAGE:
+            st.session_state['director_offset'] -= DIRECTORS_PER_PAGE
+
+    with col2:
+        if st.button("Next"):
+            st.session_state['director_offset'] += DIRECTORS_PER_PAGE
+
+
+1. Top 5 Directors by the Number of Movies Directed
+
+sql
+
+SELECT d.director_name, COUNT(m.id) AS movie_count
+FROM directed d
+JOIN movie m ON d.id = m.id
+GROUP BY d.director_name
+ORDER BY movie_count DESC
+LIMIT 5;
+
+2. Top 5 Movies with the Highest Profit Margin (Revenue-to-Budget Ratio)
+
+sql
+
+SELECT m.original_title, f.revenue / f.budget AS profit_margin
+FROM movie m
+JOIN finances f ON m.id = f.id
+WHERE f.budget > 0
+ORDER BY profit_margin DESC
+LIMIT 5;
+
+3. Directors with the Most Movies in the Top 100 Grossing Films
+
+sql
+
+SELECT d.director_name, COUNT(m.id) AS movie_count
+FROM directed d
+JOIN movie m ON d.id = m.id
+JOIN finances f ON m.id = f.id
+ORDER BY f.revenue DESC
+LIMIT 100
+GROUP BY d.director_name
+ORDER BY movie_count DESC;
+
+4. Actors with the Highest Average Vote in Sci-Fi Movies
+
+sql
+
+SELECT c.actor_name, AVG(imd.vote_average) AS avg_vote
+FROM cast c
+JOIN movie m ON c.id = m.id
+JOIN movie_genre mg ON m.id = mg.id
+JOIN imdb_details imd ON m.id = imd.id
+WHERE mg.genre = 'Sci-Fi'
+GROUP BY c.actor_name
+ORDER BY avg_vote DESC
+LIMIT 5;
+
+5. For Each Director, the Actor They Collaborated with the Most & the Highest-Grossing Movie
+
+sql
+
+WITH DirectorActorCollab AS (
+    SELECT d.director_name, c.actor_name, COUNT(m.id) AS collab_count, MAX(f.revenue) AS highest_gross
+    FROM directed d
+    JOIN movie m ON d.id = m.id
+    JOIN cast c ON m.id = c.id
+    JOIN finances f ON m.id = f.id
+    GROUP BY d.director_name, c.actor_name
+)
+SELECT director_name, actor_name, collab_count, highest_gross
+FROM DirectorActorCollab
+ORDER BY collab_count DESC;
+
+6. Correlation Between Higher Popularity Scores and Higher Box Office Revenue Across Genres
+
+sql
+
+SELECT mg.genre, CORR(imd.popularity, f.revenue) AS popularity_revenue_corr
+FROM movie_genre mg
+JOIN movie m ON mg.id = m.id
+JOIN imdb_details imd ON m.id = imd.id
+JOIN finances f ON m.id = f.id
+GROUP BY mg.genre
+ORDER BY popularity_revenue_corr DESC;
+
+7. Actors with the Highest Difference in Average Ratings in Drama vs. Comedy Movies
+
+sql
+
+WITH AvgRatings AS (
+    SELECT c.actor_name, mg.genre, AVG(imd.vote_average) AS avg_vote
+    FROM cast c
+    JOIN movie m ON c.id = m.id
+    JOIN movie_genre mg ON m.id = mg.id
+    JOIN imdb_details imd ON m.id = imd.id
+    WHERE mg.genre IN ('Drama', 'Comedy')
+    GROUP BY c.actor_name, mg.genre
+)
+SELECT a1.actor_name, a1.avg_vote - a2.avg_vote AS rating_diff
+FROM AvgRatings a1
+JOIN AvgRatings a2 ON a1.actor_name = a2.actor_name
+WHERE a1.genre = 'Drama' AND a2.genre = 'Comedy'
+ORDER BY rating_diff DESC
+LIMIT 5;
+
+8. Top 5 Production Companies by Total Revenue Across Different Genres
+
+sql
+
+SELECT p.production_company, SUM(f.revenue) AS total_revenue
+FROM production p
+JOIN movie m ON p.id = m.id
+JOIN finances f ON m.id = f.id
+JOIN movie_genre mg ON m.id = mg.id
+GROUP BY p.production_company
+ORDER BY total_revenue DESC
+LIMIT 5;
+
+9. Actors with the Most Appearances in High-Rated Movies Across Different Genres
+
+sql
+
+SELECT c.actor_name, COUNT(m.id) AS high_rated_movies_count
+FROM cast c
+JOIN movie m ON c.id = m.id
+JOIN imdb_details imd ON m.id = imd.id
+JOIN movie_genre mg ON m.id = mg.id
+WHERE imd.vote_average > 8.0
+GROUP BY c.actor_name
+ORDER BY high_rated_movies_count DESC
+LIMIT 5;
+
+10. Genres with the Most Profitable Sequels and Prequels
+
+sql
+
+SELECT mg.genre, AVG(f.revenue / f.budget) AS avg_profit_margin
+FROM movie_genre mg
+JOIN movie m ON mg.id = m.id
+JOIN finances f ON m.id = f.id
+WHERE m.original_title LIKE '%2' OR m.original_title LIKE '%Prequel%'
+GROUP BY mg.genre
+ORDER BY avg_profit_margin DESC
+LIMIT 5;
+
+
+
+####Modified code before logout specifications
+
+import pandas as pd
+import plotly.express as px
+from conn import create_connection,run_query
+import streamlit as st
+from logout import clear_session
+
+def user_dashboard():
+
+    def add_custom_css():
+        st.markdown(
+        """
+        <style>
+        /* Background color for the page */
+        body {
+            background-color: #01172B;
+        }
+        .header1 {
+            padding: 1rem;
+            color: white;
+            background-color: #4B6587;
+            text-align: left;
+            width: 100%;
+            border-radius: 8px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    add_custom_css()
+
+    col1, col2 = st.columns([9, 1])
+    with col2:
+        if st.button("Logout"):
+            clear_session()
+            
+    st.markdown('<div class="header1"><h1>User Dashboard</h1></div>', unsafe_allow_html=True)
+
+
+    coln1, coln2 ,coln3 = st.columns([1,1,1])
+
+    ###############################################    Query1   ############################################## 
+    with coln1:
+        if 'director_offset' not in st.session_state:
+            st.session_state['director_offset'] = 0
+        DIRECTORS_PER_PAGE = 5
+
+        def fetch_directors(offset, limit):
+            query = f"""
+                SELECT d.director_name, COUNT(m.id) AS movie_count
+                FROM directed d
+                JOIN movie m ON d.id = m.id
+                GROUP BY d.director_name
+                ORDER BY movie_count DESC
+                LIMIT {limit} OFFSET {offset};
+            """
+            return run_query(query)
+
+
+        
+
+            # Fetch the current page of directors
+        directors = fetch_directors(st.session_state['director_offset'], DIRECTORS_PER_PAGE)
+        df_directors = pd.DataFrame(directors, columns=["Director Name", "Movies Directed"])
+
+            # Display the top directors
+        st.subheader("Top Directors by Number of Movies")
+        st.table(df_directors)
+
+            # Pagination controls
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("Previous") and st.session_state['director_offset'] >= DIRECTORS_PER_PAGE:
+                st.session_state['director_offset'] -= DIRECTORS_PER_PAGE
+
+        with col2:
+            if st.button("Next"):
+                st.session_state['director_offset'] += DIRECTORS_PER_PAGE
+        
+    
+    
+    ###############################################   end of Query1   ############################################## 
+    
+    
+     ###############################################    Query2   ############################################## 
+    
+    
+    
+    with coln2:
+        query1 = "SELECT m.original_title, f.revenue / f.budget AS profit_margin FROM movie m  JOIN finances f ON m.id = f.id WHERE f.budget > 0 ORDER BY profit_margin DESC LIMIT 5;"
+        movie_data = run_query(query1)
+        df = pd.DataFrame(movie_data, columns=[ "movie_title","profit_margin"])
+
+        st.write("Revenue-to-Budget Ratio:")
+        plot_type = st.selectbox("Select Plot Type", ["Bar Chart", "Scatter Plot", "Pie Chart"])
+
+        if plot_type == "Bar Chart":
+            fig1= px.bar(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+            st.plotly_chart(fig1)
+            fig1.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=(dict(showgrid=False))
+        )
+        elif plot_type == "Scatter Plot":
+            fig = px.scatter(df, x="movie_title", y="profit_margin", title="Highest Profit Margin")
+            st.plotly_chart(fig)
+        elif plot_type == "Pie Chart":
+            fig = px.pie(df, values="profit_margin", names="movie_title", title="Highest Profit Margin")
+            st.plotly_chart(fig)
+
+
+
+    ###############################################   end of Query2  ############################################## 
+    
+
+  
