@@ -61,12 +61,12 @@ def show_movies_table():
 
 def show_metadata_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM metadata;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "keywords", "tagline", "runtime (mins)", "homepage", "overview"])
 
-    st.write("Movie Data:")
+    st.write("Movie MetaData:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -81,12 +81,12 @@ def show_metadata_table():
 
 def show_imdb_details_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM imdb_details;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "imdb_id", "popularity", "vote_count", "vote_average"])
 
-    st.write("Movie Data:")
+    st.write("Movie IMDb Details:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -101,12 +101,12 @@ def show_imdb_details_table():
 
 def show_directors_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM directed;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "director_name"])
 
-    st.write("Movie Data:")
+    st.write("Movie Directors:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -121,12 +121,12 @@ def show_directors_table():
 
 def show_cast_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM movie_cast;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "actor name"])
 
-    st.write("Movie Data:")
+    st.write("Movie Cast details:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -141,12 +141,12 @@ def show_cast_table():
 
 def show_genre_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM movie_genre;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "genre"])
 
-    st.write("Movie Data:")
+    st.write("Movie Genre:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -161,12 +161,12 @@ def show_genre_table():
 
 def show_production_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM production;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "production_company"])
 
-    st.write("Movie Data:")
+    st.write("Movie Producers Details:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -181,12 +181,12 @@ def show_production_table():
 
 def show_finances_table():
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM finances;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "budget", "revenue", "budget_adj", "revenue_adj"])
 
-    st.write("Movie Data:")
+    st.write("Movie Finances Data:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -202,12 +202,12 @@ def show_finances_table():
 def show_release_details_table():
 
     # Query to get basic movie data
-    query = "SELECT * FROM movie;"
+    query = "SELECT * FROM release_details;"
     movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+    df = pd.DataFrame(movies, columns=["id", "release_date", "release_year"])
 
-    st.write("Movie Data:")
+    st.write("Movie Release Data:")
     st.dataframe(df)
 
     # Option to add new movie
@@ -221,21 +221,11 @@ def show_release_details_table():
         st.success("Movie added successfully!")
 
 def show_god_mode():
-    # Query to get basic movie data
-    query = "SELECT * FROM movie;"
-    movies = run_query(query)
-
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
-
-    st.write("Movie Data:")
-    st.dataframe(df)
-
-    # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
-    org_title = st.text_input("original title")
-
-    if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
+    # Page to add all movie details at once
+    coln1, coln2, coln3 = st.columns([1, 1, 1])
+    with coln1:
+        st.markdown('---')
+    with coln2:
+        st.markdown('## Work in Progress')
+    with coln3:
+        st.markdown('---')

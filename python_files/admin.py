@@ -12,32 +12,32 @@ def admin_dashboard():
     
     with st.sidebar:
         selected = option_menu (menu_title = "Admin",
-                                options=["home", "movies", "metadata", "imdb details", "directors", "cast", "genre", "production", "finances", "release details", "GOD MODE"],
+                                options=["Home", "Movies", "Metadata", "IMDb Details", "Directors", "Cast", "Genre", "Production", "Finances", "Release Details", "GOD MODE"],
                                default_index=0,
-                               icons=("house-lock-fill", "film", "film", "database-fill-lock", "film", "film", "film", "film", "film", "film", "shield-lock"),
+                               icons=("house-lock-fill", "film", "postcard", "database-fill", "camera-reels", "people-fill", "puzzle", "building", "currency-exchange", "ticket-perforated-fill", "shield-lock"),
                                menu_icon='person-fill-lock'
                                )
     
     # Selected Page to Show
-    if selected == "home":
+    if selected == "Home":
         admin_main_dashboard()
-    elif selected == "movies":
+    elif selected == "Movies":
         show_movies_table()
-    elif selected == "metadata":
+    elif selected == "Metadata":
         show_metadata_table()
-    elif selected == "imdb details":
+    elif selected == "IMDb details":
         show_imdb_details_table()
-    elif selected == "directors":
+    elif selected == "Directors":
         show_directors_table()
-    elif selected == "cast":
+    elif selected == "Cast":
         show_cast_table()
-    elif selected == "genre":
+    elif selected == "Genre":
         show_genre_table()
-    elif selected == "production":
+    elif selected == "Production":
         show_production_table()
-    elif selected == "finances":
+    elif selected == "Finances":
         show_finances_table()
-    elif selected == "release details":
+    elif selected == "Release Details":
         show_release_details_table()
     elif selected == "GOD MODE":
         show_god_mode()
