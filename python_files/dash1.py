@@ -156,7 +156,7 @@ def show_main_dashboard1():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16))
+                    )
             st.plotly_chart(fig)
 
             
@@ -193,7 +193,7 @@ def show_main_dashboard1():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16))
+                    )
                 st.plotly_chart(fig)
 
                 

@@ -59,8 +59,7 @@ def show_main_dashboard2():
                 st.markdown('<div class="header-text"> Popularity vs. Revenue by Genre</div>', unsafe_allow_html=True)
                 fig1 = px.line(
                     revenue_df, x="Genre", y="Popularity_revenue_corr",
-                    title="Yearly Revenue Trend",
-                    labels={"Year": "Year", "Revenue": "Total Revenue ($)"}
+                   labels={"Year": "Year", "Revenue": "Total Revenue ($)"}
                 )
                 fig1.update_layout(
                    
@@ -69,7 +68,7 @@ def show_main_dashboard2():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16)
+                    
                 )
                 fig1.update_traces(line=dict(color="cyan", width=2))
                 fig1.update_layout(plot_bgcolor="rgba(0,0,0,0)")
@@ -121,7 +120,7 @@ def show_main_dashboard2():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16)
+                    
                 )
 
                 # Display the animated chart
@@ -191,7 +190,7 @@ def show_main_dashboard2():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16)
+                    
                 )
 
                 # Display the plot
@@ -249,7 +248,7 @@ def show_main_dashboard2():
                     font_color="#cfd8dc",
                     xaxis=dict(showgrid=False, color="#cfd8dc"),
                     yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16)
+                    
                 )
 
 
