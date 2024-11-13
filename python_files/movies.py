@@ -92,6 +92,7 @@ def login():
             st.session_state["logged_in"] = True
             st.session_state["role"] = role
             st.session_state["username"] = username
+            st.session_state["password"] = password
         else:
             st.error("Please enter your username and password")
     
@@ -107,10 +108,13 @@ def main():
         st.session_state["logged_in"] = False
 
     if st.session_state["logged_in"]:
-        if st.session_state["role"] == "Admin":
+        if st.session_state["role"] == "Admin" and st.session_state["password"] == "456" and st.session_state["username"] == "admin":
             admin_dashboard()
-        else:
+        elif st.session_state["role"] == "User" and st.session_state["password"] == "123" and st.session_state["username"] == "user":
             user_dashboard()
+        else:
+            login()   
+            st.error("Please enter your username and password")
     else:
         login()
 
