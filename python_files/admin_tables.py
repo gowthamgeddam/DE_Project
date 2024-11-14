@@ -329,25 +329,40 @@ def show_finances_table():
             st.warning("Oops! Error inserting finance details, check your inputs or contact admin")    
 
 def show_release_details_table():
+    if 'show_df' not in st.session_state:
+        st.session_state.show_df = True
+    def refresh_df():
+            st.session_state.show_df = not st.session_state.show_df
+            time.sleep(0.001)
+            st.session_state.show_df = not st.session_state.show_df
+    
+    if st.session_state.show_df:
+        # Query to get movie release details
+        query = "SELECT * FROM release_details;"
+        movies = run_query(query)
 
-    # Query to get basic movie data
-    query = "SELECT * FROM release_details;"
-    movies = run_query(query)
+        df = pd.DataFrame(movies, columns=["id", "release_date", "release_year"])
 
-    df = pd.DataFrame(movies, columns=["id", "release_date", "release_year"])
+        st.write("Movie Release Details:")
+        st.dataframe(df)
+        
+    st.button(label=" ", on_click=refresh_df, icon=":material/refresh:")
 
-    st.write("Movie Release Data:")
-    st.dataframe(df)
+    # Option to add new actor
+    st.markdown("### Add movie release details:")
+    movie_id = st.number_input("Movie ID")
+    release_date = st.date_input("Release Date", format='YYYY-MM-DD')
+    release_year = st.number_input("Release Year")
 
-    # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
-    org_title = st.text_input("original title")
-
-    if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
+    if st.button("Add release details"):
+        query = f"INSERT INTO release_details (id, release_date, release_year) VALUES ({movie_id}, '{release_date}', {release_year})"
+        try:
+            query_return = run_query(query)
+            if query_return=="Done":
+                # refresh_df()
+                st.success(f"Movie Release details added successfully! {query_return}")
+        except:
+            st.warning("Oops! Error inserting release details, check your inputs or contact admin") 
 
 def show_god_mode():
     # Page to add all movie details at once
