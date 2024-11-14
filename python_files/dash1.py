@@ -59,25 +59,10 @@ def show_main_dashboard1():
             # Fetch the current page of directors
             directors = fetch_directors()
             df_directors = pd.DataFrame(directors, columns=["Director Name", "Movies Directed"])
-
+            df_directors.index +=1
             # Display the top directors
-            st.markdown('<div class="header-text">Top Directors by Number of Movies</div>', unsafe_allow_html=True)
-            fig2 = px.pie(
-                        df_directors, values="Movies Directed", names="Director Name",
-                        title="Movies Count",
-                        hole=0.3
-                    )
-            fig2.update_layout(plot_bgcolor="#2b2b2b",
-                    paper_bgcolor="#2b2b2b",
-                    font_color="#cfd8dc",
-                    xaxis=dict(showgrid=False, color="#cfd8dc"),
-                    yaxis=dict(color="#cfd8dc"),
-                    title_font=dict(size=16))
-            fig2.update_traces(textinfo="percent+label")
-            st.plotly_chart(fig2, use_container_width=True)
-
-
-           
+            st.markdown('<div class="header-text">Top 5 Directors by Number of Movies</div>', unsafe_allow_html=True)
+            st.dataframe(df_directors)
 
         ###############################################   end of Query1   ##############################################
 
