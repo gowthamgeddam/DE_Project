@@ -220,24 +220,39 @@ def show_cast_table():
             st.warning("Oops! Error inserting actor details, check your inputs or contact admin")
 
 def show_genre_table():
-    # Query to get basic movie data
-    query = "SELECT * FROM movie_genre;"
-    movies = run_query(query)
+    if 'show_df' not in st.session_state:
+        st.session_state.show_df = True
+    def refresh_df():
+            st.session_state.show_df = not st.session_state.show_df
+            time.sleep(0.001)
+            st.session_state.show_df = not st.session_state.show_df
+    
+    if st.session_state.show_df:
+        # Query to get basic movie data
+        query = "SELECT * FROM movie_genre;"
+        movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "genre"])
+        df = pd.DataFrame(movies, columns=["id", "genre"])
 
-    st.write("Movie Genre:")
-    st.dataframe(df)
+        st.markdown("### Movie Genre:")
+        st.dataframe(df)
+        
+    st.button(label=" ", on_click=refresh_df, icon=":material/refresh:")
 
-    # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
-    org_title = st.text_input("original title")
+    # Option to add new actor
+    st.markdown("### Add movie genre:")
+    movie_id = st.number_input("Movie ID", placeholder="135397")
+    genre = st.text_input("Genre", placeholder="Adventure")
 
-    if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
+    if st.button("Add genre"):
+        query = f"INSERT INTO movie_genre (id, genre) VALUES ({movie_id}, '{genre}')"
+        try:
+            query_return = run_query(query)
+            if query_return=="Done":
+                # refresh_df()
+                st.success(f"Genre details added successfully! {query_return}")
+        except:
+            st.warning("Oops! Error inserting genre details, check your inputs or contact admin")
 
 def show_production_table():
     # Query to get basic movie data
