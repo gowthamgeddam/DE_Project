@@ -83,14 +83,13 @@ def login():
     # Text inputs for username and password with placeholders
     username = st.text_input("Username", placeholder="Enter your username", key="input_username")
     password = st.text_input("Password", type="password", placeholder="Enter your password", key="input_password")
-    role = st.selectbox("Role", ["User", "Admin"], key="input_role")
+    
 
     # Login button
     if st.button("Login", key="login_button"):
-        if authenticate(username, password, role):
+        if authenticate(username, password):
             # Set session state only upon successful login
             st.session_state["logged_in"] = True
-            st.session_state["role"] = role
             st.session_state["username"] = username
             st.session_state["password"] = password
         else:
@@ -98,19 +97,19 @@ def login():
     
     st.markdown('</div>', unsafe_allow_html=True)  # Close login-container
 
-def authenticate(username, password, role):
+def authenticate(username, password):
     # Hardcoded users for example, replace with database check
     users = {"user": "123", "admin": "456"}
-    return username in users and users[username] == password and role in ["User", "Admin"]
+    return username in users and users[username] == password 
 
 def main():
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
 
     if st.session_state["logged_in"]:
-        if st.session_state["role"] == "Admin" and st.session_state["password"] == "456" and st.session_state["username"] == "admin":
+        if st.session_state["password"] == "456" and st.session_state["username"] == "admin":
             admin_dashboard()
-        elif st.session_state["role"] == "User" and st.session_state["password"] == "123" and st.session_state["username"] == "user":
+        elif st.session_state["password"] == "123" and st.session_state["username"] == "user":
             user_dashboard()
         else:
             login()   
