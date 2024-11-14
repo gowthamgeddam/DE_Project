@@ -522,3 +522,84 @@ WHERE ( 'sequel' = ANY(metadata.keywords) OR 'prequel' = ANY(metadata.keywords) 
   AND finances.budget_adj > 0 AND finances.revenue_adj > 0
 GROUP BY movie_genre.genre
 ORDER BY avg_profit_margin DESC;
+
+
+CREATE OR REPLACE FUNCTION get_top5(genre VARCHAR) RETURNS TABLE (
+    movie_id BIGINT,
+    release_year INT,
+    imdb_rating DOUBLE PRECISION ) AS $$
+    BEGIN
+    RETURN QUERY 
+    SELECT p.production_company, SUM(f.revenue) AS total_revenue
+                        FROM production p
+                        JOIN movie m ON p.id = m.id
+                        JOIN finances f ON m.id = f.id
+                        JOIN movie_genre mg ON m.id = mg.id
+                        GROUP BY p.production_company
+                        ORDER BY total_revenue DESC
+                        LIMIT {limit} OFFSET {offset};
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+
+    with coln4:
+                 # Initialize session state for pagination
+                if 'prod_offset' not in st.session_state:
+                    st.session_state['prod_offset'] = 0
+
+                # Number of records per page
+                records_per_page = 5
+
+                # Query with pagination
+                def fetch_top_production_companies(offset, limit):
+                    query = f"""
+                        SELECT p.production_company, SUM(f.revenue) AS total_revenue
+                        FROM production p
+                        JOIN movie m ON p.id = m.id
+                        JOIN finances f ON m.id = f.id
+                        JOIN movie_genre mg ON m.id = mg.id
+                        GROUP BY p.production_company
+                        ORDER BY total_revenue DESC
+                        LIMIT {limit} OFFSET {offset};
+                    """
+                    return run_query(query)
+                genre = st.text_input("Enter Genre:", "Action")
+
+            
+
+                        
+                # Fetch data for the current page
+                data = fetch_top_production_companies(st.session_state['prod_offset'], records_per_page)
+                df = pd.DataFrame(data, columns=["Production Company", "Total Revenue"])
+                st.markdown('<div class="header-text">Top Production Companies by Total Revenue</div>', unsafe_allow_html=True)
+                # Create a bar chart using Plotly
+                fig = px.bar(
+                    df, x="Total Revenue", y="Production Company", orientation='h',
+                    
+                    labels={"Total Revenue": "Total Revenue", "Production Company": "Production Company"}
+                )
+                fig.update_layout(
+                    plot_bgcolor="#2b2b2b",
+                    paper_bgcolor="#2b2b2b",
+                    font_color="#cfd8dc",
+                    xaxis=dict(showgrid=False, color="#cfd8dc"),
+                    yaxis=dict(color="#cfd8dc"),
+                    
+                )
+
+
+                # Display the chart
+                st.plotly_chart(fig, use_container_width=True)
+
+                # Pagination controls
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col1:
+                    if st.button("Previous Companies") and st.session_state['prod_offset'] >= records_per_page:
+                        st.session_state['prod_offset'] -= records_per_page
+
+                with col3:
+                    if st.button("Next Companies"):
+                        st.session_state['prod_offset'] += records_per_page
+
+        ###############################################   end of Query8  ##############################################

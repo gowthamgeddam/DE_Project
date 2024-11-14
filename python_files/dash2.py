@@ -211,59 +211,26 @@ def show_main_dashboard2():
 
         ###############################################    Query8   ##############################################
         with coln4:
-                 # Initialize session state for pagination
-                if 'prod_offset' not in st.session_state:
-                    st.session_state['prod_offset'] = 0
+                st.markdown('<div class="header-text">Top Production Companies by Total Revenue in each Genre</div>', unsafe_allow_html=True)
+                gen_list = run_query("SELECT DISTINCT genre FROM movie_genre ORDER BY genre")
+                genres = [genre[0] for genre in gen_list]
 
-                # Number of records per page
-                records_per_page = 5
+                #genres = gen_list['genre'].tolist()
+                selected_genre = st.selectbox("Select Genre:", genres)
 
-                # Query with pagination
-                def fetch_top_production_companies(offset, limit):
-                    query = f"""
-                        SELECT p.production_company, SUM(f.revenue) AS total_revenue
-                        FROM production p
-                        JOIN movie m ON p.id = m.id
-                        JOIN finances f ON m.id = f.id
-                        JOIN movie_genre mg ON m.id = mg.id
-                        GROUP BY p.production_company
-                        ORDER BY total_revenue DESC
-                        LIMIT {limit} OFFSET {offset};
-                    """
-                    return run_query(query)
-
-                # Fetch data for the current page
-                data = fetch_top_production_companies(st.session_state['prod_offset'], records_per_page)
-                df = pd.DataFrame(data, columns=["Production Company", "Total Revenue"])
-                st.markdown('<div class="header-text">Top Production Companies by Total Revenue</div>', unsafe_allow_html=True)
-                # Create a bar chart using Plotly
-                fig = px.bar(
-                    df, x="Total Revenue", y="Production Company", orientation='h',
+                # Fetch and display data on submit
+                if st.button("Show Top 5 Production Companies"):
                     
-                    labels={"Total Revenue": "Total Revenue", "Production Company": "Production Company"}
-                )
-                fig.update_layout(
-                    plot_bgcolor="#2b2b2b",
-                    paper_bgcolor="#2b2b2b",
-                    font_color="#cfd8dc",
-                    xaxis=dict(showgrid=False, color="#cfd8dc"),
-                    yaxis=dict(color="#cfd8dc"),
-                    
-                )
+                    result_df =run_query("SELECT * FROM get_top_production_companies_by_genre(%s);", (selected_genre,))
+                    df_top5 = pd.DataFrame(result_df, columns=["Production company", "Total Revenue"])
+                    if not df_top5.empty:
+                        st.write(f"Top 5 Production Companies in {selected_genre} genre:")
+                        st.table(df_top5)
+                    else:
+                        st.write("No data found for the selected genre.")
 
 
-                # Display the chart
-                st.plotly_chart(fig, use_container_width=True)
-
-                # Pagination controls
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col1:
-                    if st.button("Previous Companies") and st.session_state['prod_offset'] >= records_per_page:
-                        st.session_state['prod_offset'] -= records_per_page
-
-                with col3:
-                    if st.button("Next Companies"):
-                        st.session_state['prod_offset'] += records_per_page
+              
 
         ###############################################   end of Query8  ##############################################
 
