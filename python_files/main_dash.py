@@ -14,8 +14,6 @@ def main_dashboard():
             def fetch_metrics():
                 metrics = {
                     "Total Movies": "SELECT COUNT(id) FROM movie;",
-                    "Total Revenue": "SELECT SUM(revenue) FROM finances;",
-                    "Average Rating": "SELECT AVG(vote_average) FROM imdb_details;",
                     "Total Directors": "SELECT COUNT(DISTINCT director_name) FROM directed;",
                     "Total Actors": "SELECT COUNT(DISTINCT actor_name) FROM movie_cast;"
                 }
