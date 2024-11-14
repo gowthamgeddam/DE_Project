@@ -40,25 +40,40 @@ def admin_main_dashboard():
         st.markdown("---")
 
 def show_movies_table():
-    # Query to get basic movie data
-    query = "SELECT * FROM movie;"
-    movies = run_query(query)
+    
+    if 'show_df' not in st.session_state:
+        st.session_state.show_df = True
+    def refresh_df():
+            st.session_state.show_df = not st.session_state.show_df
+            time.sleep(0.001)
+            st.session_state.show_df = not st.session_state.show_df
+    
+    if st.session_state.show_df:
+        # Query to get basic movie data
+        query = "SELECT * FROM movie;"
+        movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "original_title"])
+        df = pd.DataFrame(movies, columns=["id", "original_title"])
 
-    st.write("Movie Data:")
-    st.dataframe(df)
-
+        st.markdown("### Movie Data:")
+        st.dataframe(df)
+    
+    st.button(label=" ", on_click=refresh_df, icon=":material/refresh:")
+    
     # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
+    st.markdown("### Add New Movie:")
+    movie_id = st.number_input("Movie ID")
     org_title = st.text_input("original title")
 
     if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
-
+        query = f"INSERT INTO movie (id, original_title) VALUES ({movie_id}, '{org_title}')"
+        try:
+            query_return = run_query(query)
+            if query_return=="Done":
+                # refresh_df()
+                st.success(f"Movie added successfully! {query_return}")
+        except:
+            st.warning("Oops! Error inserting movie, contact admin")
 def show_metadata_table():
     # Query to get basic movie data
     query = "SELECT * FROM metadata;"
