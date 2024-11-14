@@ -83,47 +83,47 @@ $$ LANGUAGE plpgsql;
 -- TRIGGERS --
 
 -- 1.  Create a logging table to store information about new movies added 
-CREATE TABLE movie_log ( 
-log_id SERIAL PRIMARY KEY, 
-movie_id INT, 
-title VARCHAR(255), 
-release_year INT, 
-added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
-);
--- Create the trigger function to log new movie entries 
-CREATE OR REPLACE FUNCTION log_new_movie() 
-RETURNS TRIGGER AS $$ 
-BEGIN -- Insert information about the new movie into the log table 
-INSERT INTO movie_log (movie_id, title, release_year) 
-VALUES (NEW.id, NEW.original_title, NEW.release_year); 
-RETURN NEW; 
-END; 
-$$ LANGUAGE plpgsql;
+-- CREATE TABLE movie_log ( 
+-- log_id SERIAL PRIMARY KEY, 
+-- movie_id INT, 
+-- title VARCHAR(255), 
+-- release_year INT, 
+-- added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+-- );
+-- -- Create the trigger function to log new movie entries 
+-- CREATE OR REPLACE FUNCTION log_new_movie() 
+-- RETURNS TRIGGER AS $$ 
+-- BEGIN -- Insert information about the new movie into the log table 
+-- INSERT INTO movie_log (movie_id, title, release_year) 
+-- VALUES (NEW.id, NEW.original_title, NEW.release_year); 
+-- RETURN NEW; 
+-- END; 
+-- $$ LANGUAGE plpgsql;
 
--- Create the trigger to call the log function after a new movie is inserted 
-CREATE TRIGGER log_new_movie 
-AFTER INSERT ON movie 
-FOR EACH ROW 
-EXECUTE FUNCTION log_new_movie(); -- Create a logging table to store information about deleted movies 
-CREATE TABLE movie_deletion_log ( 
-log_id SERIAL PRIMARY KEY, 
-movie_id INT, 
-title VARCHAR(255), 
-deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
-); 
+-- -- Create the trigger to call the log function after a new movie is inserted 
+-- CREATE TRIGGER log_new_movie 
+-- AFTER INSERT ON movie 
+-- FOR EACH ROW 
+-- EXECUTE FUNCTION log_new_movie(); -- Create a logging table to store information about deleted movies 
+-- CREATE TABLE movie_deletion_log ( 
+-- log_id SERIAL PRIMARY KEY, 
+-- movie_id INT, 
+-- title VARCHAR(255), 
+-- deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+-- ); 
 
--- 2. Create the trigger function to log movie deletions 
-CREATE OR REPLACE FUNCTION log_movie_deletion() 
-RETURNS TRIGGER AS $$ 
-BEGIN -- Insert information about the deleted movie into the log table 
-INSERT INTO movie_deletion_log (movie_id, title, deleted_at) 
-VALUES (OLD.id, OLD.original_title, CURRENT_TIMESTAMP); 
-RETURN OLD; 
-END; 
-$$ LANGUAGE plpgsql;
+-- -- 2. Create the trigger function to log movie deletions 
+-- CREATE OR REPLACE FUNCTION log_movie_deletion() 
+-- RETURNS TRIGGER AS $$ 
+-- BEGIN -- Insert information about the deleted movie into the log table 
+-- INSERT INTO movie_deletion_log (movie_id, title, deleted_at) 
+-- VALUES (OLD.id, OLD.original_title, CURRENT_TIMESTAMP); 
+-- RETURN OLD; 
+-- END; 
+-- $$ LANGUAGE plpgsql;
 
--- Create the trigger to call the log function after a movie is deleted 
-CREATE TRIGGER log_movie_deletion 
-AFTER DELETE ON movie 
-FOR EACH ROW 
-EXECUTE FUNCTION log_movie_deletion(); 
+-- -- Create the trigger to call the log function after a movie is deleted 
+-- CREATE TRIGGER log_movie_deletion 
+-- AFTER DELETE ON movie 
+-- FOR EACH ROW 
+-- EXECUTE FUNCTION log_movie_deletion(); 
