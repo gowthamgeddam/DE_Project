@@ -10,6 +10,7 @@ from dash1 import show_main_dashboard1
 from dash2 import show_main_dashboard2
 from dash3 import show_main_dashboard3
 from main_dash import main_dashboard
+from dashfunc import main_functions
 
 def user_dashboard():
     # Custom CSS for background and header
@@ -56,9 +57,9 @@ def user_dashboard():
 
     with st.sidebar:
         selected = option_menu (menu_title = "User Dashboard",
-                                options=["home","page1","page2","page3"],
+                                options=["home","page1","page2","page3","page4"],
                                default_index=0,
-                               icons=("house","house","house","house"),
+                               icons=("house","house","house","house","house"),
                                )
     
    
@@ -84,8 +85,10 @@ def user_dashboard():
         show_main_dashboard1()
     elif selected == "page2":
         show_main_dashboard2()
-    else:
+    elif selected == "page3":
         show_main_dashboard3()
+    else:
+        main_functions()
 
 
 

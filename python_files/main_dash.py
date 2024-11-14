@@ -43,16 +43,7 @@ def main_dashboard():
                 data = run_query(query)
                 return pd.DataFrame(data, columns=["Year", "Revenue"])
 
-            # Sidebar
-            with st.sidebar:
-                  # Update path to your logo
-                st.title("Movie Metrics Dashboard")
-                st.markdown("**Navigate**")
-                st.button("Home")
-                st.button("Movies")
-                st.button("Directors")
-                st.button("Actors")
-                st.button("Genres")
+            
 
             def animate_metric(end_value):
                 value = 0
