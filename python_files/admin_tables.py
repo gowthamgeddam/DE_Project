@@ -255,24 +255,40 @@ def show_genre_table():
             st.warning("Oops! Error inserting genre details, check your inputs or contact admin")
 
 def show_production_table():
-    # Query to get basic movie data
-    query = "SELECT * FROM production;"
-    movies = run_query(query)
+    if 'show_df' not in st.session_state:
+        st.session_state.show_df = True
+    def refresh_df():
+            st.session_state.show_df = not st.session_state.show_df
+            time.sleep(0.001)
+            st.session_state.show_df = not st.session_state.show_df
+    
+    if st.session_state.show_df:
+        # Query to get production company details
+        query = "SELECT * FROM production;"
+        movies = run_query(query)
 
-    df = pd.DataFrame(movies, columns=["id", "production_company"])
+        df = pd.DataFrame(movies, columns=["id", "production_company"])
 
-    st.write("Movie Producers Details:")
-    st.dataframe(df)
+        st.markdown("### Movie Producers Details:")
+        st.dataframe(df)
+        
+    st.button(label=" ", on_click=refresh_df, icon=":material/refresh:")
 
-    # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
-    org_title = st.text_input("original title")
+    # Option to add new actor
+    st.markdown("### Add movie production company:")
+    movie_id = st.number_input("Movie ID", placeholder="135397")
+    production_company = st.text_input("Production Company", placeholder="BioScope Films Ltd.")
 
-    if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
+    if st.button("Add production company"):
+        query = f"INSERT INTO production (id, production_company) VALUES ({movie_id}, '{production_company}')"
+        try:
+            query_return = run_query(query)
+            if query_return=="Done":
+                # refresh_df()
+                st.success(f"Production Company details added successfully! {query_return}")
+        except:
+            st.warning("Oops! Error inserting Production Company details, check your inputs or contact admin")
+    
 
 def show_finances_table():
     # Query to get basic movie data
