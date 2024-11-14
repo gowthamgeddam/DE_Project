@@ -74,25 +74,42 @@ def show_movies_table():
                 st.success(f"Movie added successfully! {query_return}")
         except:
             st.warning("Oops! Error inserting movie, contact admin")
+
 def show_metadata_table():
-    # Query to get basic movie data
-    query = "SELECT * FROM metadata;"
-    movies = run_query(query)
-
-    df = pd.DataFrame(movies, columns=["id", "keywords", "tagline", "runtime (mins)", "homepage", "overview"])
-
-    st.write("Movie MetaData:")
-    st.dataframe(df)
+    if 'show_df' not in st.session_state:
+        st.session_state.show_df = True
+    def refresh_df():
+            st.session_state.show_df = not st.session_state.show_df
+            time.sleep(0.001)
+            st.session_state.show_df = not st.session_state.show_df
+    
+    if st.session_state.show_df:
+        # Query to get movie metadata
+        query = "SELECT * FROM metadata;"
+        movies = run_query(query)
+        df = pd.DataFrame(movies, columns=["id", "keywords", "tagline", "runtime (mins)", "homepage", "overview"])
+        st.write("Movie MetaData:")
+        st.dataframe(df)
+    st.button(label=" ", on_click=refresh_df, icon=":material/refresh:")
 
     # Option to add new movie
-    st.write("Add New Movie:")
-    movie_id = st.text_input("Movie ID")
-    org_title = st.text_input("original title")
+    st.markdown("### Add New Movie:")
+    movie_id = st.number_input("Movie ID", placeholder="135397")
+    keywords = st.text_input("List of keywords", placeholder="{word1,word2,..}")
+    tagline = st.text_input("Tagline")
+    runtime = st.number_input("runtime (mins)")
+    homepage = st.text_input("Homepage URL", placeholder="https://iitpkd.ac.in/")
+    overview = st.text_input("overview")
 
-    if st.button("Add Movie"):
-        query = "INSERT INTO movie (original_title, release_date) VALUES (%s, %s)"
-        run_query(query, (movie_id, org_title))
-        st.success("Movie added successfully!")
+    if st.button("Add metadata for movie"):
+        query = f"INSERT INTO metadata (id, keywords, tagline, runtime, homepage, overview) VALUES ({movie_id}, '{keywords}', '{tagline}', {runtime}, '{homepage}', '{overview}' )"
+        try:
+            query_return = run_query(query)
+            if query_return=="Done":
+                # refresh_df()
+                st.success(f"Movie metadata added successfully! {query_return}")
+        except:
+            st.warning("Oops! Error inserting movie metadata, check your inputs or contact admin")
 
 def show_imdb_details_table():
     # Query to get basic movie data
