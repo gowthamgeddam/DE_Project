@@ -13,7 +13,13 @@ def run_query(query, params=None):
     conn = create_connection()
     cur = conn.cursor()
     cur.execute(query, params)
-    data = cur.fetchall()
-    cur.close()
-    conn.close()
-    return data
+    try:
+        data = cur.fetchall()
+        cur.close()
+        conn.close()
+        return data
+    except:
+        conn.commit()
+        # cur.close()
+        conn.close()
+        return "Done"
