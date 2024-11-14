@@ -26,7 +26,7 @@ def admin_dashboard():
         show_movies_table()
     elif selected == "Metadata":
         show_metadata_table()
-    elif selected == "IMDb details":
+    elif selected == "IMDb Details":
         show_imdb_details_table()
     elif selected == "Directors":
         show_directors_table()
