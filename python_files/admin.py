@@ -2,6 +2,7 @@ import streamlit as st
 from logout import clear_session
 from streamlit_option_menu import option_menu
 from admin_tables import *
+from queries import *
 
 def admin_dashboard():
     
@@ -12,7 +13,7 @@ def admin_dashboard():
     
     with st.sidebar:
         selected = option_menu (menu_title = "Admin",
-                                options=["Home", "Movies", "Metadata", "IMDb Details", "Directors", "Cast", "Genre", "Production", "Finances", "Release Details", "GOD MODE"],
+                                options=["Home", "Movies", "Metadata", "IMDb Details", "Directors", "Cast", "Genre", "Production", "Finances", "Release Details", "GOD MODE", "query5", "query10"],
                                default_index=0,
                                icons=("house-lock-fill", "film", "postcard", "database-fill", "camera-reels", "people-fill", "puzzle", "building", "currency-exchange", "ticket-perforated-fill", "shield-lock"),
                                menu_icon='person-fill-lock'
@@ -41,5 +42,9 @@ def admin_dashboard():
         show_release_details_table()
     elif selected == "GOD MODE":
         show_god_mode()
+    elif selected == "query5":
+        show_query5()
+    elif selected == "query10":
+        show_query10()
     else:
         admin_main_dashboard()
